@@ -25,8 +25,8 @@ namespace FluentMigrator.Runner.DNX
         {
             const string usage = @"Fluent Migrator DNX Runner
   Usage:
-    dnx run --provider PROVIDER --connectionString CONNECTION [--output FILE] [--assembly ASSEMBLY] [--task TASK] [--migrateToVersion END] [--profile PROFILE] [--tag TAG] [--verbose]
-    dnx run --provider PROVIDER --noConnection --output FILE [--assembly ASSEMBLY] [--task TASK] [--startVersion START] [--migrateToVersion END] [--profile PROFILE] [--tag TAG] [--verbose]
+    dnx run --provider PROVIDER --connectionString CONNECTION [--output FILE] [--assembly ASSEMBLY] [--task TASK] [--migrateToVersion END] [--profile PROFILE] [--tag TAG] [--context VALUE] [--verbose]
+    dnx run --provider PROVIDER --noConnection --output FILE [--assembly ASSEMBLY] [--task TASK] [--startVersion START] [--migrateToVersion END] [--profile PROFILE] [--tag TAG] [--context VALUE] [--verbose]
     dnx run --version
     dnx run --help
 
@@ -54,6 +54,7 @@ namespace FluentMigrator.Runner.DNX
     --migrateToVersion END                          The specific version to migrate. Default is 0, which will run all migrations. [default: 0]
     --profile PROFILE                               The profile to run after executing migrations.
     --tag TAG                                       Filters the migrations to be run by tag.
+    --context VALUE                                 A string argument that can be used in a migration.
     --verbose                                       Verbose. Optional.
     --help -h                                       Show this screen.
     --version -v                                    Show version.
@@ -101,6 +102,8 @@ namespace FluentMigrator.Runner.DNX
                 profile = arguments["--profile"].ToString();
             if (arguments["--tag"] != null)
                 tags = arguments["--tag"].AsList.Cast<string>();
+            if (arguments["--context"] != null)
+                applicationContext = arguments["--context"].ToString();
             if (arguments["--output"].ToString() == "migration.sql")
                 ExecuteMigrations();
             else
@@ -150,6 +153,7 @@ namespace FluentMigrator.Runner.DNX
         private string profile;
         private IEnumerable<string> tags;
         private string assembly;
+        private string applicationContext;
 
         private void ExecuteMigrations()
         {
@@ -189,7 +193,8 @@ namespace FluentMigrator.Runner.DNX
                 StartVersion = startVersion,
                 Version = migrateToVersion,
                 Profile = profile,
-                Tags = tags
+                Tags = tags,
+                ApplicationContext = applicationContext
             }).Execute();
     }
 }
